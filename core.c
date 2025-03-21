@@ -123,8 +123,8 @@ void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
             double rij2 = rx * rx + ry * ry + rz * rz;
 
             if (rij2 <= rcut2) {
-                double r2inv = 1.0 / rij2;
-                double r6inv = r2inv * r2inv * r2inv;
+                const double r2inv = 1.0 / rij2;
+                const double r6inv = r2inv * r2inv * r2inv;
 
                 double fr = 24.0 * r2inv * r6inv * (2.0 * r6inv - 1.0);
 
