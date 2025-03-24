@@ -11,8 +11,8 @@ void init_pos(double* rxyz, const double rho)
 {
     // inicialización de las posiciones de los átomos en un cristal FCC
 
-    double a = cbrt(4.0 / rho);
-    int nucells = ceil(cbrt((double)N / 4.0));
+    const double a = cbrt(4.0 / rho);
+    const int nucells = ceil(cbrt((double)N / 4.0));
     int idx = 0;
 
     for (int i = 0; i < nucells; i++) {
@@ -97,7 +97,7 @@ void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
         fxyz[i] = 0.0;
     }
     double pres_vir = 0.0;
-    double rcut2 = RCUT * RCUT;
+    const double rcut2 = RCUT * RCUT;
     *epot = 0.0;
 
     for (int i = 0; i < 3 * (N - 1); i += 3) {
@@ -108,9 +108,9 @@ void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
 
         for (int j = i + 3; j < 3 * N; j += 3) {
 
-            double xj = rxyz[j + 0];
-            double yj = rxyz[j + 1];
-            double zj = rxyz[j + 2];
+            const double xj = rxyz[j + 0];
+            const double yj = rxyz[j + 1];
+            const double zj = rxyz[j + 2];
 
             // distancia mínima entre r_i y r_j
             double rx = xi - xj;
@@ -120,7 +120,7 @@ void forces(const double* rxyz, double* fxyz, double* epot, double* pres,
             double rz = zi - zj;
             rz = minimum_image(rz, L);
 
-            double rij2 = rx * rx + ry * ry + rz * rz;
+            const double rij2 = rx * rx + ry * ry + rz * rz;
 
             if (rij2 <= rcut2) {
                 const double r2inv = 1.0 / rij2;
