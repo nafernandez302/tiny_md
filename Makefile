@@ -1,7 +1,9 @@
 CC      = gcc
-CFLAGS	= -O0
+CFLAGS	= -O3
+CPPFLAGS = -DN=$(N)
 WFLAGS	= -std=c11 -Wall -Wextra -g
 LDFLAGS	= -lm
+N?=256
 
 TARGETS	= tiny_md viz
 SOURCES	= $(shell echo *.c)
