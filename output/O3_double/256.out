@@ -1,0 +1,196 @@
+# Número de partículas:      256
+# Temperatura de referencia: 2.00
+# Pasos de equilibración:    500
+# Pasos de medición:         1500
+# (mediciones cada 10 pasos)
+# densidad, volumen, energía potencial media, presión media
+1.200000	213.333333	-1407.622325	28.810961
+1.100000	232.727273	-1519.992030	17.703536
+1.000000	256.000000	-1317.055495	14.706909
+0.900000	284.444444	-1282.524486	9.214358
+0.800000	320.000000	-1219.051421	5.226680
+0.700000	365.714286	-1105.677206	2.954104
+0.600000	426.666667	-963.064260	1.711730
+0.500000	512.000000	-812.600919	1.051136
+0.400000	640.000000	-651.468910	0.718353
+# Tiempo total de simulación = 6.167620 segundos
+# Tiempo simulado = 108.000000 [fs]
+# ns/day = 1.512934
+# Número de partículas:      256
+# Temperatura de referencia: 2.00
+# Pasos de equilibración:    500
+# Pasos de medición:         1500
+# (mediciones cada 10 pasos)
+# densidad, volumen, energía potencial media, presión media
+1.200000	213.333333	-1405.938361	28.847555
+1.100000	232.727273	-1521.359092	17.682377
+1.000000	256.000000	-1295.941958	15.141208
+0.900000	284.444444	-1284.090367	9.196442
+0.800000	320.000000	-1216.737016	5.307833
+0.700000	365.714286	-1104.358771	2.990997
+0.600000	426.666667	-959.270423	1.777277
+0.500000	512.000000	-807.373031	1.069838
+0.400000	640.000000	-646.528768	0.725253
+# Tiempo total de simulación = 6.187155 segundos
+# Tiempo simulado = 108.000000 [fs]
+# ns/day = 1.508157
+# Número de partículas:      256
+# Temperatura de referencia: 2.00
+# Pasos de equilibración:    500
+# Pasos de medición:         1500
+# (mediciones cada 10 pasos)
+# densidad, volumen, energía potencial media, presión media
+1.200000	213.333333	-1406.062254	28.849285
+1.100000	232.727273	-1520.720513	17.685715
+1.000000	256.000000	-1291.632575	15.233243
+0.900000	284.444444	-1289.013204	9.092220
+0.800000	320.000000	-1217.011141	5.287419
+0.700000	365.714286	-1103.226790	3.032860
+0.600000	426.666667	-960.184162	1.733677
+0.500000	512.000000	-802.346175	1.054157
+0.400000	640.000000	-646.412545	0.723265
+# Tiempo total de simulación = 6.195085 segundos
+# Tiempo simulado = 108.000000 [fs]
+# ns/day = 1.506226
+# Número de partículas:      256
+# Temperatura de referencia: 2.00
+# Pasos de equilibración:    500
+# Pasos de medición:         1500
+# (mediciones cada 10 pasos)
+# densidad, volumen, energía potencial media, presión media
+1.200000	213.333333	-1406.317552	28.835391
+1.100000	232.727273	-1519.310902	17.720397
+1.000000	256.000000	-1283.470384	15.384531
+0.900000	284.444444	-1282.203722	9.224108
+0.800000	320.000000	-1216.491766	5.324771
+0.700000	365.714286	-1101.411902	3.045409
+0.600000	426.666667	-959.250708	1.747570
+0.500000	512.000000	-802.119557	1.095316
+0.400000	640.000000	-654.545100	0.714758
+# Tiempo total de simulación = 6.177970 segundos
+# Tiempo simulado = 108.000000 [fs]
+# ns/day = 1.510399
+# Número de partículas:      256
+# Temperatura de referencia: 2.00
+# Pasos de equilibración:    500
+# Pasos de medición:         1500
+# (mediciones cada 10 pasos)
+# densidad, volumen, energía potencial media, presión media
+1.200000	213.333333	-1406.103602	28.839137
+1.100000	232.727273	-1515.760844	17.791683
+1.000000	256.000000	-1291.859582	15.206120
+0.900000	284.444444	-1290.034902	9.083886
+0.800000	320.000000	-1219.006525	5.277286
+0.700000	365.714286	-1100.563954	3.031242
+0.600000	426.666667	-960.322427	1.753488
+0.500000	512.000000	-801.326676	1.130326
+0.400000	640.000000	-644.914626	0.694667
+# Tiempo total de simulación = 6.137589 segundos
+# Tiempo simulado = 108.000000 [fs]
+# ns/day = 1.520336
+# Número de partículas:      256
+# Temperatura de referencia: 2.00
+# Pasos de equilibración:    500
+# Pasos de medición:         1500
+# (mediciones cada 10 pasos)
+# densidad, volumen, energía potencial media, presión media
+1.200000	213.333333	-1406.658271	28.832088
+1.100000	232.727273	-1518.032145	17.735539
+1.000000	256.000000	-1291.177115	15.248606
+0.900000	284.444444	-1283.110654	9.240140
+0.800000	320.000000	-1213.291847	5.336609
+0.700000	365.714286	-1101.555629	3.023547
+0.600000	426.666667	-957.725168	1.786842
+0.500000	512.000000	-804.721674	1.080719
+0.400000	640.000000	-648.489457	0.701855
+# Tiempo total de simulación = 6.190753 segundos
+# Tiempo simulado = 108.000000 [fs]
+# ns/day = 1.507280
+# Número de partículas:      256
+# Temperatura de referencia: 2.00
+# Pasos de equilibración:    500
+# Pasos de medición:         1500
+# (mediciones cada 10 pasos)
+# densidad, volumen, energía potencial media, presión media
+1.200000	213.333333	-1409.663272	28.770704
+1.100000	232.727273	-1519.579710	17.714556
+1.000000	256.000000	-1291.812788	15.224089
+0.900000	284.444444	-1281.783522	9.245918
+0.800000	320.000000	-1210.777240	5.398867
+0.700000	365.714286	-1101.870343	3.029332
+0.600000	426.666667	-956.937096	1.755048
+0.500000	512.000000	-801.912224	1.054808
+0.400000	640.000000	-649.099990	0.694555
+# Tiempo total de simulación = 6.195306 segundos
+# Tiempo simulado = 108.000000 [fs]
+# ns/day = 1.506173
+# Número de partículas:      256
+# Temperatura de referencia: 2.00
+# Pasos de equilibración:    500
+# Pasos de medición:         1500
+# (mediciones cada 10 pasos)
+# densidad, volumen, energía potencial media, presión media
+1.200000	213.333333	-1408.367533	28.804297
+1.100000	232.727273	-1521.505549	17.668636
+1.000000	256.000000	-1284.779999	15.393492
+0.900000	284.444444	-1283.314386	9.220322
+0.800000	320.000000	-1217.749608	5.271020
+0.700000	365.714286	-1101.254761	3.034070
+0.600000	426.666667	-959.383331	1.768796
+0.500000	512.000000	-802.219541	1.080268
+0.400000	640.000000	-646.543823	0.714693
+# Tiempo total de simulación = 6.166348 segundos
+# Tiempo simulado = 108.000000 [fs]
+# ns/day = 1.513246
+# Número de partículas:      256
+# Temperatura de referencia: 2.00
+# Pasos de equilibración:    500
+# Pasos de medición:         1500
+# (mediciones cada 10 pasos)
+# densidad, volumen, energía potencial media, presión media
+1.200000	213.333333	-1407.512417	28.813677
+1.100000	232.727273	-1516.605448	17.775228
+1.000000	256.000000	-1296.790082	15.158949
+0.900000	284.444444	-1286.794224	9.142529
+0.800000	320.000000	-1223.050695	5.200846
+0.700000	365.714286	-1099.515145	3.027057
+0.600000	426.666667	-957.953580	1.772244
+0.500000	512.000000	-802.017735	1.099620
+0.400000	640.000000	-652.200546	0.691547
+# Tiempo total de simulación = 6.217806 segundos
+# Tiempo simulado = 108.000000 [fs]
+# ns/day = 1.500722
+# Número de partículas:      256
+# Temperatura de referencia: 2.00
+# Pasos de equilibración:    500
+# Pasos de medición:         1500
+# (mediciones cada 10 pasos)
+# densidad, volumen, energía potencial media, presión media
+1.200000	213.333333	-1408.190959	28.811572
+1.100000	232.727273	-1523.179627	17.630149
+1.000000	256.000000	-1291.184164	15.246185
+0.900000	284.444444	-1288.718562	9.094930
+0.800000	320.000000	-1209.886046	5.443209
+0.700000	365.714286	-1103.239621	3.016015
+0.600000	426.666667	-961.222391	1.762083
+0.500000	512.000000	-800.053620	1.094726
+0.400000	640.000000	-642.495972	0.733563
+# Tiempo total de simulación = 6.295669 segundos
+# Tiempo simulado = 108.000000 [fs]
+# ns/day = 1.482162
+
+ Performance counter stats for './tiny_md' (10 runs):
+
+          6,191.99 msec task-clock                       #    0.999 CPUs utilized               ( +-  0.22% )
+                76      context-switches                 #   12.274 /sec                        ( +-  3.40% )
+                 0      cpu-migrations                   #    0.000 /sec                      
+                83      page-faults                      #   13.404 /sec                        ( +-  0.37% )
+    22,400,422,310      cycles                           #    3.618 GHz                         ( +-  0.23% )
+     1,338,987,285      stalled-cycles-frontend          #    5.98% frontend cycles idle        ( +-  0.30% )
+    25,680,807,289      instructions                     #    1.15  insn per cycle            
+                                                  #    0.05  stalled cycles per insn     ( +-  0.01% )
+     4,978,942,853      branches                         #  804.094 M/sec                       ( +-  0.04% )
+       382,717,090      branch-misses                    #    7.69% of all branches             ( +-  0.22% )
+
+            6.1952 +- 0.0133 seconds time elapsed  ( +-  0.21% )
+
