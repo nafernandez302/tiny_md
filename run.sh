@@ -1,18 +1,22 @@
 #!/bin/bash
 
-# Verificar si se han pasado ambos parámetros N y name
-if [ -z "$1" ] || [ -z "$2" ]; then
-  echo "Debe proporcionar dos parámetros: N (número) y path (ruta del archivo)."
+# Verificar si se han pasado ambos parámetros N y path
+if [ -z "$1" ]; then
+  echo "Debe proporcionar path (ruta del archivo)."
   exit 1
 fi
 
-# Asignar valores a las variables N y name
-N=$1
-path=$2
+# Asignar valores a las variables N y path
+path=$1
+numeros=(256 500 864 1372 2048 2916)
 
 # Limpia los archivos y compila nuevamente
-make clean
-make N="$N"
+for num in "${numeros[@]}"; do
+  make clean
+  make N=${num}
 
-# Ejecutar el programa tiny_md y redirigir la salida al archivo output/name
-perf stat ./tiny_md > "output/${path}/${N}.out" 2>&1
+  # Ejecutar el programa tiny_md y redirigir la salida al archivo output/path
+  perf stat ./tiny_md > "output/${path}/${num}.out" 2>&1
+
+done
+
