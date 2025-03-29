@@ -1,0 +1,22 @@
+free(): invalid next size (normal)
+./tiny_md: Aborted
+
+ Performance counter stats for './tiny_md':
+
+        413,047.21 msec task-clock                       #    1.000 CPUs utilized             
+             1,029      context-switches                 #    2.491 /sec                      
+                 7      cpu-migrations                   #    0.017 /sec                      
+               155      page-faults                      #    0.375 /sec                      
+ 1,427,863,653,120      cycles                           #    3.457 GHz                       
+     6,742,118,994      stalled-cycles-frontend          #    0.47% frontend cycles idle      
+ 4,310,604,817,813      instructions                     #    3.02  insn per cycle            
+                                                  #    0.00  stalled cycles per insn   
+   770,899,365,237      branches                         #    1.866 G/sec                     
+       646,874,551      branch-misses                    #    0.08% of all branches           
+
+     413.086109904 seconds time elapsed
+
+     412.916380000 seconds user
+       0.127988000 seconds sys
+
+
