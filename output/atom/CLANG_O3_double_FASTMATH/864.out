@@ -1,22 +1,40 @@
-free(): invalid next size (normal)
-./tiny_md: Aborted
+# Número de partículas:      864
+# Temperatura de referencia: 2.00
+# Pasos de equilibración:    500
+# Pasos de medición:         1500
+# (mediciones cada 10 pasos)
+# densidad, volumen, energía potencial media, presión media
+1.200000	720.000000	-4751.522667	28.813174
+1.100000	785.454545	-5127.656857	17.724126
+1.000000	864.000000	-4369.859641	15.178023
+0.900000	960.000000	-4348.036247	9.114933
+0.800000	1080.000000	-4102.495437	5.343465
+0.700000	1234.285714	-3714.724869	3.052890
+0.600000	1440.000000	-3246.819752	1.767363
+0.500000	1728.000000	-2720.033237	1.076962
+0.400000	2160.000000	-2195.996057	0.705344
+# Tiempo total de simulación = 64.000954 segundos
+# Tiempo simulado = 108.000000 [fs]
+# ns/day = 0.145798
+# cells/s = 13.499799
+
 
  Performance counter stats for './tiny_md':
 
-         35,196.53 msec task-clock                       #    1.000 CPUs utilized             
-                66      context-switches                 #    1.875 /sec                      
+         64,000.42 msec task-clock                       #    1.000 CPUs utilized             
+               123      context-switches                 #    1.922 /sec                      
                  0      cpu-migrations                   #    0.000 /sec                      
-                99      page-faults                      #    2.813 /sec                      
-   122,956,509,312      cycles                           #    3.493 GHz                       
-       131,765,285      stalled-cycles-frontend          #    0.11% frontend cycles idle      
-   378,448,783,093      instructions                     #    3.08  insn per cycle            
-                                                  #    0.00  stalled cycles per insn   
-    67,505,542,588      branches                         #    1.918 G/sec                     
-        19,042,980      branch-misses                    #    0.03% of all branches           
+               102      page-faults                      #    1.594 /sec                      
+   231,202,601,042      cycles                           #    3.613 GHz                       
+    13,004,527,774      stalled-cycles-frontend          #    5.62% frontend cycles idle      
+   229,410,061,468      instructions                     #    0.99  insn per cycle            
+                                                  #    0.06  stalled cycles per insn   
+    53,221,114,063      branches                         #  831.574 M/sec                     
+     4,003,131,701      branch-misses                    #    7.52% of all branches           
 
-      35.200428787 seconds time elapsed
+      64.005866571 seconds time elapsed
 
-      35.177324000 seconds user
-       0.019998000 seconds sys
+      63.889130000 seconds user
+       0.111987000 seconds sys
 
 
