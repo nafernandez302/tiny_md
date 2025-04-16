@@ -2,4 +2,7 @@ tiny_md
 viz
 *.o
 .depend
-
+*.log
+perf.data*
+*.xyz
+*.html
