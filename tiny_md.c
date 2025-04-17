@@ -13,13 +13,13 @@ int main()
     FILE *file_xyz, *file_thermo;
     file_xyz = fopen("trajectory.xyz", "w");
     file_thermo = fopen("thermo.log", "w");
-    double Ekin, Epot, Temp, Pres; // variables macroscopicas
-    double Rho, cell_V, cell_L, tail, Etail, Ptail;
-    double *rxyz, *vxyz, *fxyz; // variables microscopicas
+    float Ekin, Epot, Temp, Pres; // variables macroscopicas
+    float Rho, cell_V, cell_L, tail, Etail, Ptail;
+    float *rxyz, *vxyz, *fxyz; // variables microscopicas
 
-    rxyz = (double*)malloc(3 * N * sizeof(double));
-    vxyz = (double*)malloc(3 * N * sizeof(double));
-    fxyz = (double*)malloc(3 * N * sizeof(double));
+    rxyz = (float*)malloc(3 * N * sizeof(float));
+    vxyz = (float*)malloc(3 * N * sizeof(float));
+    fxyz = (float*)malloc(3 * N * sizeof(float));
 
     printf("# Número de partículas:      %d\n", N);
     printf("# Temperatura de referencia: %.2f\n", T0);
@@ -30,22 +30,22 @@ int main()
     fprintf(file_thermo, "# t Temp Pres Epot Etot\n");
 
     srand(SEED);
-    double t = 0.0, sf;
-    double Rhob;
+    float t = 0.0, sf;
+    float Rhob;
     Rho = RHOI;
     init_pos(rxyz, Rho);
     double start = wtime();
     for (int m = 0; m < 9; m++) {
         Rhob = Rho;
-        Rho = RHOI - 0.1 * (double)m;
-        cell_V = (double)N / Rho;
-        cell_L = cbrt(cell_V);
+        Rho = RHOI - 0.1 * (float)m;
+        cell_V = (float)N / Rho;
+        cell_L = cbrtf(cell_V);
         tail = 16.0 * M_PI * Rho * ((2.0 / 3.0) * pow(RCUT, -9) - pow(RCUT, -3)) / 3.0;
-        Etail = tail * (double)N;
+        Etail = tail * (float)N;
         Ptail = tail * Rho;
 
         int i = 0;
-        sf = cbrt(Rhob / Rho);
+        sf = cbrtf(Rhob / Rho);
         for (int k = 0; k < 3 * N; k++) { // reescaleo posiciones a nueva densidad
             rxyz[k] *= sf;
         }
@@ -56,19 +56,19 @@ int main()
 
             velocity_verlet(rxyz, vxyz, fxyz, &Epot, &Ekin, &Pres, &Temp, Rho, cell_V, cell_L);
 
-            sf = sqrt(T0 / Temp);
+            sf = sqrtf(T0 / Temp);
             for (int k = 0; k < 3 * N; k++) { // reescaleo de velocidades
                 vxyz[k] *= sf;
             }
         }
 
         int mes = 0;
-        double epotm = 0.0, presm = 0.0;
+        float epotm = 0.0, presm = 0.0;
         for (i = TEQ; i < TRUN; i++) { // loop de medicion
 
             velocity_verlet(rxyz, vxyz, fxyz, &Epot, &Ekin, &Pres, &Temp, Rho, cell_V, cell_L);
 
-            sf = sqrt(T0 / Temp);
+            sf = sqrtf(T0 / Temp);
             for (int k = 0; k < 3 * N; k++) { // reescaleo de velocidades
                 vxyz[k] *= sf;
             }
