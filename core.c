@@ -7,7 +7,7 @@
 #define ECUT (4.0f * (powf(RCUT, -12.0f) - powf(RCUT, -6.0f)))
 
 
-void init_pos(float* rxyz, const float rho)
+void init_pos(float* rx, float* ry, float* rz, const float rho)
 {
     // inicialización de las posiciones de los átomos en un cristal FCC
 
@@ -20,23 +20,23 @@ void init_pos(float* rxyz, const float rho)
         for (int j = 0; j < nucells; j++, fj += 1.0f) {
             float fk = 0.0f;
             for (int k = 0; k < nucells; k++, fk += 1.0f) {
-                rxyz[idx + 0] = fi * a; // x
-                rxyz[idx + 1] = fj * a; // y
-                rxyz[idx + 2] = fk * a; // z
+                rx[idx] = fi * a; // x
+                ry[idx] = fj * a; // y
+                rz[idx] = fk * a; // z
                     // del mismo átomo
-                rxyz[idx + 3] = (fi + 0.5f) * a;
-                rxyz[idx + 4] = (fj + 0.5f) * a;
-                rxyz[idx + 5] = fk * a;
+                rx[idx + 1] = (fi + 0.5f) * a;
+                ry[idx + 1] = (fj + 0.5f) * a;
+                rz[idx + 1] = fk * a;
 
-                rxyz[idx + 6] = (fi + 0.5f) * a;
-                rxyz[idx + 7] = fj * a;
-                rxyz[idx + 8] = (fk + 0.5f) * a;
+                rx[idx + 2] = (fi + 0.5f) * a;
+                ry[idx + 2] = fj * a;
+                rz[idx + 2] = (fk + 0.5f) * a;
 
-                rxyz[idx + 9] = fi * a;
-                rxyz[idx + 10] = (fj + 0.5f) * a;
-                rxyz[idx + 11] = (fk + 0.5f) * a;
+                rx[idx + 3] = fi * a;
+                ry[idx + 3] = (fj + 0.5f) * a;
+                rz[idx + 3] = (fk + 0.5f) * a;
 
-                idx += 12;
+                idx += 4;
             }
         }
     }
@@ -89,7 +89,7 @@ static float minimum_image(float cordi, const float cell_length)
 }
 
 
-void forces(const float* rxyz, float* fxyz, float* epot, float* pres,
+void forces(const float* rx, const float* ry, const float* rz, float* fxyz, float* epot, float* pres,
             const float* temp, const float rho, const float V, const float L)
 {
     // calcula las fuerzas LJ (12-6)
@@ -102,26 +102,26 @@ void forces(const float* rxyz, float* fxyz, float* epot, float* pres,
     *epot = 0.0f;
 
     for (int i = 0; i < 3 * (N - 1); i += 3) {
-
-        float xi = rxyz[i + 0];
-        float yi = rxyz[i + 1];
-        float zi = rxyz[i + 2];
+        int i_MOD = (i / 3) % (N-1);
+        float xi = rx[i_MOD];
+        float yi = ry[i_MOD];
+        float zi = rz[i_MOD];
 
         for (int j = i + 3; j < 3 * N; j += 3) {
-
-            const float xj = rxyz[j + 0];
-            const float yj = rxyz[j + 1];
-            const float zj = rxyz[j + 2];
+            int j_MOD = (j /3) % N;
+            const float xj = rx[j_MOD];
+            const float yj = ry[j_MOD];
+            const float zj = rz[j_MOD];
 
             // distancia mínima entre r_i y r_j
-            float rx = xi - xj;
-            rx = minimum_image(rx, L);
-            float ry = yi - yj;
-            ry = minimum_image(ry, L);
-            float rz = zi - zj;
-            rz = minimum_image(rz, L);
+            float _rx = xi - xj;
+            _rx = minimum_image(_rx, L);
+            float _ry = yi - yj;
+            _ry = minimum_image(_ry, L);
+            float _rz = zi - zj;
+            _rz = minimum_image(_rz, L);
 
-            const float rij2 = rx * rx + ry * ry + rz * rz;
+            const float rij2 = _rx * _rx + _ry * _ry + _rz * _rz;
             
             if (rij2 <= rcut2) {
                 const float r2inv = 1.0f / rij2;
@@ -129,13 +129,13 @@ void forces(const float* rxyz, float* fxyz, float* epot, float* pres,
 
                 float fr = 24.0f * r2inv * r6inv * (2.0f * r6inv - 1.0f);
 
-                fxyz[i + 0] += fr * rx;
-                fxyz[i + 1] += fr * ry;
-                fxyz[i + 2] += fr * rz;
+                fxyz[i + 0] += fr * _rx;
+                fxyz[i + 1] += fr * _ry;
+                fxyz[i + 2] += fr * _rz;
 
-                fxyz[j + 0] -= fr * rx;
-                fxyz[j + 1] -= fr * ry;
-                fxyz[j + 2] -= fr * rz;
+                fxyz[j + 0] -= fr * _rx;
+                fxyz[j + 1] -= fr * _ry;
+                fxyz[j + 2] -= fr * _rz;
 
                 *epot += (4.0f * r6inv * (r6inv - 1.0f) - ECUT) ;
                 pres_vir += fr * rij2;
@@ -159,26 +159,27 @@ static float pbc(float cordi, const float cell_length)
 }
 
 
-void velocity_verlet(float* rxyz, float* vxyz, float* fxyz, float* epot,
+void velocity_verlet(float* rx, float* ry, float* rz, float* vxyz, float* fxyz, float* epot,
                      float* ekin, float* pres, float* temp, const float rho,
                      const float V, const float L)
 {
 
     for (int i = 0; i < 3 * N; i += 3) { // actualizo posiciones
-        rxyz[i + 0] += vxyz[i + 0] * DT + 0.5f * fxyz[i + 0] * DT * DT;
-        rxyz[i + 1] += vxyz[i + 1] * DT + 0.5f * fxyz[i + 1] * DT * DT;
-        rxyz[i + 2] += vxyz[i + 2] * DT + 0.5f * fxyz[i + 2] * DT * DT;
+        int i_MOD = (i / 3)%N;
+        rx[i_MOD] += vxyz[i + 0] * DT + 0.5f * fxyz[i + 0] * DT * DT;
+        ry[i_MOD] += vxyz[i + 1] * DT + 0.5f * fxyz[i + 1] * DT * DT;
+        rz[i_MOD] += vxyz[i + 2] * DT + 0.5f * fxyz[i + 2] * DT * DT;
 
-        rxyz[i + 0] = pbc(rxyz[i + 0], L);
-        rxyz[i + 1] = pbc(rxyz[i + 1], L);
-        rxyz[i + 2] = pbc(rxyz[i + 2], L);
+        rx[i_MOD] = pbc(rx[i_MOD], L);
+        ry[i_MOD] = pbc(ry[i_MOD], L);
+        rz[i_MOD] = pbc(rz[i_MOD], L);
 
         vxyz[i + 0] += 0.5f * fxyz[i + 0] * DT;
         vxyz[i + 1] += 0.5f * fxyz[i + 1] * DT;
         vxyz[i + 2] += 0.5f * fxyz[i + 2] * DT;
     }
 
-    forces(rxyz, fxyz, epot, pres, temp, rho, V, L); // actualizo fuerzas
+    forces(rx, ry, rz, fxyz, epot, pres, temp, rho, V, L); // actualizo fuerzas
 
     float sumv2 = 0.0;
     for (int i = 0; i < 3 * N; i += 3) { // actualizo velocidades
