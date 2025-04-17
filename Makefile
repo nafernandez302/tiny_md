@@ -1,5 +1,5 @@
-CC      = gcc
-CFLAGS	= -O3
+CC      = clang # activar compilador AMD (!)
+CFLAGS	= -O3 -ffast-math -march=native
 CPPFLAGS = -DN=$(N)
 WFLAGS	= -std=c11 -Wall -Wextra -g
 LDFLAGS	= -lm
