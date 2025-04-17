@@ -1,0 +1,40 @@
+# Número de partículas:      864
+# Temperatura de referencia: 2.00
+# Pasos de equilibración:    500
+# Pasos de medición:         1500
+# (mediciones cada 10 pasos)
+# densidad, volumen, energía potencial media, presión media
+1.200000	720.000000	-4745.747500	28.844792
+1.100000	785.454529	-5124.579583	17.740654
+1.000000	864.000000	-4374.076250	15.145986
+0.900000	960.000061	-4347.986250	9.136298
+0.800000	1080.000000	-4109.571667	5.312638
+0.700000	1234.285767	-3713.060417	3.047551
+0.600000	1440.000000	-3237.037708	1.783684
+0.500000	1728.000000	-2716.283750	1.083180
+0.400000	2160.000000	-2191.158958	0.707233
+# Tiempo total de simulación = 22.390761 segundos
+# Tiempo simulado = 108.004065 [fs]
+# ns/day = 0.416759
+# cells/s = 38.587344
+
+
+ Performance counter stats for './tiny_md':
+
+         22,385.59 msec task-clock                       #    1.000 CPUs utilized             
+               220      context-switches                 #    9.828 /sec                      
+                 1      cpu-migrations                   #    0.045 /sec                      
+                91      page-faults                      #    4.065 /sec                      
+    79,873,298,599      cycles                           #    3.568 GHz                       
+     1,272,749,997      stalled-cycles-frontend          #    1.59% frontend cycles idle      
+   208,444,520,927      instructions                     #    2.61  insn per cycle            
+                                                  #    0.01  stalled cycles per insn   
+    14,833,001,239      branches                         #  662.614 M/sec                     
+       323,682,986      branch-misses                    #    2.18% of all branches           
+
+      22.393521840 seconds time elapsed
+
+      22.285425000 seconds user
+       0.099970000 seconds sys
+
+
