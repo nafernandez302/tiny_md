@@ -4,7 +4,7 @@
 #include <math.h>
 #include <stdlib.h> // rand()
 
-#define ECUT (4.0 * (pow(RCUT, -12) - pow(RCUT, -6)))
+#define ECUT (4.0f * (powf(RCUT, -12.0f) - powf(RCUT, -6.0f)))
 
 
 void init_pos(float* rxyz, const float rho)
@@ -80,12 +80,11 @@ void init_vel(float* vxyz, float* temp, float* ekin)
 static float minimum_image(float cordi, const float cell_length)
 {
     // imagen más cercana
-
-    if (cordi <= -0.5f * cell_length) {
-        cordi += cell_length;
-    } else if (cordi > 0.5f * cell_length) {
-        cordi -= cell_length;
-    }
+    
+    float caso_sumar = (cordi <= -0.5f * cell_length) ? 1.0f : 0.0f;
+    float caso_restar = (cordi > 0.5f *  cell_length) ? 1.0f : 0.0f;
+    cordi += (caso_sumar) * cell_length
+            -(caso_restar) * cell_length;
     return cordi;
 }
 
@@ -125,7 +124,7 @@ void forces(const float* rxyz, float* fxyz, float* epot, float* pres,
             const float rij2 = rx * rx + ry * ry + rz * rz;
             
             if (rij2 <= rcut2) {
-                const float r2inv = 1.0 / rij2;
+                const float r2inv = 1.0f / rij2;
                 const float r6inv = r2inv * r2inv * r2inv;
 
                 float fr = 24.0f * r2inv * r6inv * (2.0f * r6inv - 1.0f);
