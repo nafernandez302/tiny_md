@@ -1,6 +1,7 @@
 #include "core.h"
 #include "parameters.h"
-
+#include <stdio.h>
+#include <omp.h>
 #include <math.h>
 #include <stdlib.h> // rand()
 
@@ -95,20 +96,20 @@ void forces(const float* rx, const float* ry, const float* rz,
 {
     // calcula las fuerzas LJ (12-6)
 
+    float local_epot = 0.0f;
+    float pres_vir = 0.0f;
+    const float rcut2 = RCUT * RCUT;
     for (int i = 0; i < N; i++) {
         fx[i] = 0.0;
         fy[i] = 0.0;
         fz[i] = 0.0;
-    }
-    float pres_vir = 0.0f;
-    const float rcut2 = RCUT * RCUT;
-    *epot = 0.0f;
-
+    }        
+    #pragma omp parallel for reduction(+: fx[:N], fy[:N], fz[:N], local_epot, pres_vir)
     for (int i = 0; i < (N - 1); i += 1) {
         float xi = rx[i];
         float yi = ry[i];
         float zi = rz[i];
-
+        
         for (int j = i + 1; j < N; j += 1) {
             const float xj = rx[j];
             const float yj = ry[j];
@@ -138,13 +139,14 @@ void forces(const float* rx, const float* ry, const float* rz,
                 fy[j] -= fr * _ry;
                 fz[j] -= fr * _rz;
 
-                *epot += (4.0f * r6inv * (r6inv - 1.0f) - ECUT) ;
+                local_epot += (4.0f * r6inv * (r6inv - 1.0f) - ECUT) ;
                 pres_vir += fr * rij2;
             }
         }
     }
     pres_vir /= (V * 3.0f);
     *pres = *temp * rho + pres_vir;
+    *epot = local_epot;
 }
 
 

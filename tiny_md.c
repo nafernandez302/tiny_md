@@ -3,6 +3,7 @@
 #include "parameters.h"
 #include "wtime.h"
 
+#include <omp.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,6 +11,7 @@
 
 int main()
 {
+    omp_set_num_threads(48);
     FILE *file_xyz, *file_thermo;
     file_xyz = fopen("trajectory.xyz", "w");
     file_thermo = fopen("thermo.log", "w");
