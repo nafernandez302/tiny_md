@@ -168,6 +168,7 @@ void velocity_verlet(float* rx, float* ry, float* rz, float* vx, float* vy, floa
                      const float V, const float L)
 {
 
+    #pragma omp parallel for
     for (int i = 0; i < N; i += 1) { // actualizo posiciones
         rx[i] += vx[i] * DT + 0.5f * fx[i] * DT * DT;
         ry[i] += vy[i] * DT + 0.5f * fy[i] * DT * DT;
@@ -184,7 +185,9 @@ void velocity_verlet(float* rx, float* ry, float* rz, float* vx, float* vy, floa
 
     forces(rx, ry, rz, fx, fy, fz, epot, pres, temp, rho, V, L); // actualizo fuerzas
 
+    
     float sumv2 = 0.0;
+    //#pragma omp parallel for reduction(+:sumv2)
     for (int i = 0; i < N; i += 1) { // actualizo velocidades
         vx[i] += 0.5f * fx[i] * DT;
         vy[i] += 0.5f * fy[i] * DT;

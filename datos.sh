@@ -7,7 +7,7 @@ numeros=(256 500 864 1372 2048 2916)
 
 
 # Recorremos todos los subdirectorios dentro de 'output/'
-for dir in output/atom/*/; do
+for dir in output/lab3/*/; do
     output_file="${dir}resultados.txt"
     touch ${output_file}
     # Recorremos cada número en la lista
