@@ -12,13 +12,19 @@ int main()
     FILE *file_xyz, *file_thermo;
     file_xyz = fopen("trajectory.xyz", "w");
     file_thermo = fopen("thermo.log", "w");
-    float Ekin, Epot, Temp, Pres; // variables macroscopicas
+    float h_Ekin, h_Epot, h_Temp, h_Pres; // variables macroscopicas
     float Rho, cell_V, cell_L, tail, Etail, Ptail;
 
     // Declarar punteros para la memoria en el host
     float *h_rx, *h_ry, *h_rz, *h_vx, *h_vy, *h_vz, *h_fx, *h_fy, *h_fz;
     // Declarar punteros para la memoria en el dispositivo
     float *d_rx, *d_ry, *d_rz, *d_vx, *d_vy, *d_vz, *d_fx, *d_fy, *d_fz;
+
+    float *d_Epot, *d_Ekin, *d_Temp, *d_Pres;
+    cudaMalloc(&d_Epot, sizeof(float));
+    cudaMalloc(&d_Ekin, sizeof(float));
+    cudaMalloc(&d_Temp, sizeof(float));
+    cudaMalloc(&d_Pres, sizeof(float));
 
     h_rx = (float*)malloc(N * sizeof(float));
     h_ry = (float*)malloc(N * sizeof(float));
@@ -73,60 +79,89 @@ int main()
             h_ry[k] *= sf;
             h_rz[k] *= sf;
         }
-        init_vel(h_vx, h_vy, h_vz, &Temp, &Ekin);
+        init_vel(h_vx, h_vy, h_vz, &h_Temp, &h_Ekin);
+        cudaMemcpy(d_Temp, &h_Temp, sizeof(float), cudaMemcpyHostToDevice);
+        cudaMemcpy(d_Ekin, &h_Ekin, sizeof(float), cudaMemcpyHostToDevice);
 
         // Copiar posiciones a la GPU
         cudaMemcpy(d_rx, h_rx, N * sizeof(float), cudaMemcpyHostToDevice);
         cudaMemcpy(d_ry, h_ry, N * sizeof(float), cudaMemcpyHostToDevice);
         cudaMemcpy(d_rz, h_rz, N * sizeof(float), cudaMemcpyHostToDevice);
 
+        cudaMemcpy(d_vx, h_vx, N * sizeof(float), cudaMemcpyHostToDevice);
+        cudaMemcpy(d_vy, h_vy, N * sizeof(float), cudaMemcpyHostToDevice);
+        cudaMemcpy(d_vz, h_vz, N * sizeof(float), cudaMemcpyHostToDevice);
+
+
         cudaDeviceSynchronize(); // Esperar a que se complete la inicialización de velocidades
 
-        forces<<<(N + 255) / 256, 256>>>(d_rx, d_ry, d_rz, d_fx, d_fy, d_fz, &Epot, &Pres, &Temp, Rho, cell_V, cell_L);
+        cudaMemset(d_fx, 0, N * sizeof(float));
+        cudaMemset(d_fy, 0, N * sizeof(float));
+        cudaMemset(d_fz, 0, N * sizeof(float));
+        forces<<<(N + 255) / 256, 256>>>(d_rx, d_ry, d_rz, d_fx, d_fy, d_fz, d_Epot, d_Pres, d_Temp, Rho, cell_V, cell_L);
         cudaDeviceSynchronize(); // Esperar a que se complete el cálculo de fuerzas
 
-        for (int i = 1; i < TEQ; i++) { // loop de equilibracion
-            velocity_verlet<<<(N + 255) / 256, 256>>>(d_rx, d_ry, d_rz, d_vx, d_vy, d_vz, d_fx, d_fy, d_fz, &Epot, &Ekin, &Pres, &Temp, Rho, cell_V, cell_L);
-            cudaDeviceSynchronize(); // Esperar a que se complete la actualización de posiciones y velocidades
 
-            sf = sqrtf(T0 / Temp);
+        for (int i = 1; i < TEQ; i++) { // loop de
+            cudaMemcpy(&h_Epot, d_Epot, sizeof(float), cudaMemcpyDeviceToHost);
+            cudaMemcpy(&h_Pres, d_Pres, sizeof(float), cudaMemcpyDeviceToHost);
+            cudaMemcpy(&h_Ekin, d_Ekin, sizeof(float), cudaMemcpyDeviceToHost);
+            cudaMemcpy(h_fx, d_fx, N * sizeof(float), cudaMemcpyDeviceToHost);
+            cudaMemcpy(h_fy, d_fy, N * sizeof(float), cudaMemcpyDeviceToHost);
+            cudaMemcpy(h_fz, d_fz, N * sizeof(float), cudaMemcpyDeviceToHost);
+            velocity_verlet(h_rx, h_ry, h_rz, h_vx, h_vy, h_vz, h_fx, h_fy, h_fz, &h_Epot, &h_Ekin, &h_Pres, &h_Temp, Rho, cell_V, cell_L);
+
+            sf = sqrtf(T0 / h_Temp);
             for (int k = 0; k < N; k++) { // reescaleo de velocidades
                 h_vx[k] *= sf;
                 h_vy[k] *= sf;
                 h_vz[k] *= sf;
             }
-            // Copiar velocidades reescaladas de vuelta a la GPU
-            cudaMemcpy(d_vx, h_vx, N * sizeof(float), cudaMemcpyHostToDevice);
-            cudaMemcpy(d_vy, h_vy, N * sizeof(float), cudaMemcpyHostToDevice);
-            cudaMemcpy(d_vz, h_vz, N * sizeof(float), cudaMemcpyHostToDevice);
         }
 
         int mes = 0;
         float epotm = 0.0, presm = 0.0;
-        for (int i = TEQ; i < TRUN; i++) { // loop de medicion
-            velocity_verlet<<<(N + 255) / 256, 256>>>(d_rx, d_ry, d_rz, d_vx, d_vy, d_vz, d_fx, d_fy, d_fz, &Epot, &Ekin, &Pres, &Temp, Rho, cell_V, cell_L);
-            cudaDeviceSynchronize(); // Esperar a que se complete la actualización de posiciones y velocidades
-
-            sf = sqrtf(T0 / Temp);
+        for (int i = TEQ; i < TRUN; i++) {
+            velocity_verlet(h_rx, h_ry, h_rz, h_vx, h_vy, h_vz,
+                            h_fx, h_fy, h_fz, &h_Epot, &h_Ekin, &h_Pres, &h_Temp,
+                            Rho, cell_V, cell_L);
+            sf = sqrtf(T0 / h_Temp);
             for (int k = 0; k < N; k++) { // reescaleo de velocidades
                 h_vx[k] *= sf;
                 h_vy[k] *= sf;
                 h_vz[k] *= sf;
             }
-            // Copiar velocidades reescaladas de vuelta a la GPU
-            cudaMemcpy(d_vx, h_vx, N * sizeof(float), cudaMemcpyHostToDevice);
-            cudaMemcpy(d_vy, h_vy, N * sizeof(float), cudaMemcpyHostToDevice);
-            cudaMemcpy(d_vz, h_vz, N * sizeof(float), cudaMemcpyHostToDevice);
+            // Copiar Temp a host para calcular el factor de escala
+            float temp_host;
+            cudaMemcpy(&temp_host, d_Temp, sizeof(float), cudaMemcpyDeviceToHost);
+
+            sf = sqrtf(T0 / h_Temp);
+            for (int k = 0; k < N; k++) { // reescaleo de velocidades
+                h_vx[k] *= sf;
+                h_vy[k] *= sf;
+                h_vz[k] *= sf;
+            }
+            cudaDeviceSynchronize();
 
             if (i % TMES == 0) {
-                Epot += Etail;
-                Pres += Ptail;
+                // Copiar datos necesarios al host para loggeo
+                float epot_host, pres_host, ekin_host;
+                cudaMemcpy(&epot_host, d_Epot, sizeof(float), cudaMemcpyDeviceToHost);
+                cudaMemcpy(&pres_host, d_Pres, sizeof(float), cudaMemcpyDeviceToHost);
+                cudaMemcpy(&ekin_host, d_Ekin, sizeof(float), cudaMemcpyDeviceToHost);
+                cudaMemcpy(h_rx, d_rx, N * sizeof(float), cudaMemcpyDeviceToHost);
+                cudaMemcpy(h_ry, d_ry, N * sizeof(float), cudaMemcpyDeviceToHost);
+                cudaMemcpy(h_rz, d_rz, N * sizeof(float), cudaMemcpyDeviceToHost);
 
-                epotm += Epot;
-                presm += Pres;
+                epot_host += Etail;
+                pres_host += Ptail;
+
+                epotm += epot_host;
+                presm += pres_host;
                 mes++;
 
-                fprintf(file_thermo, "%f %f %f %f %f\n", t, Temp, Pres, Epot, Epot + Ekin);
+                fprintf(file_thermo, "%f %f %f %f %f\n", t, temp_host, pres_host,
+                        epot_host, epot_host + ekin_host);
                 fprintf(file_xyz, "%d\n\n", N);
                 for (int k = 0; k < N; k++) {
                     fprintf(file_xyz, "Ar %e %e %e\n", h_rx[k], h_ry[k], h_rz[k]);
@@ -135,6 +170,7 @@ int main()
 
             t += DT;
         }
+
         printf("%f\t%f\t%f\t%f\n", Rho, cell_V, epotm / (double)mes, presm / (double)mes);
     }
 
