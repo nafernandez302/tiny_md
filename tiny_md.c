@@ -11,7 +11,7 @@
 
 int main()
 {
-    omp_set_num_threads(40);
+    omp_set_num_threads(1);
     FILE *file_xyz, *file_thermo;
     file_xyz = fopen("trajectory.xyz", "w");
     file_thermo = fopen("thermo.log", "w");
