@@ -5,7 +5,7 @@ WFLAGS	= -std=c11 -Wall -Wextra -g
 LDFLAGS	= -lm
 N?=256
 
-TARGETS	= tiny_md viz
+TARGETS	= tiny_md
 SOURCES	= $(shell echo *.c)
 OBJECTS = core.o wtime.o
 
