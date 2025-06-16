@@ -1,4 +1,3 @@
-#define _XOPEN_SOURCE 500  // M_PI
 #include "core.h"
 #include "parameters.h"
 #include "wtime.h"
@@ -15,9 +14,9 @@ int main()
     file_thermo = fopen("thermo.log", "w");
     float Ekin, Epot, Temp, Pres; // variables macroscopicas
     float Rho, cell_V, cell_L, tail, Etail, Ptail;
-    
+
     // Declarar punteros para la memoria en el host
-    float *h_rx, *h_ry, *h_rz, *h_vx, *h_vy, *h_vz, *h_fx, *h_fy, *h_fz; 
+    float *h_rx, *h_ry, *h_rz, *h_vx, *h_vy, *h_vz, *h_fx, *h_fy, *h_fz;
     // Declarar punteros para la memoria en el dispositivo
     float *d_rx, *d_ry, *d_rz, *d_vx, *d_vy, *d_vz, *d_fx, *d_fy, *d_fz;
 
@@ -58,7 +57,7 @@ int main()
     cudaMalloc((void**)&d_fy, N * sizeof(float));
     cudaMalloc((void**)&d_fz, N * sizeof(float));
 
-    double start = wtime();
+    // double start = wtime();
     for (int m = 0; m < 9; m++) {
         Rhob = Rho;
         Rho = RHOI - 0.1 * (float)m;
@@ -74,13 +73,13 @@ int main()
             h_ry[k] *= sf;
             h_rz[k] *= sf;
         }
+        init_vel(h_vx, h_vy, h_vz, &Temp, &Ekin);
 
         // Copiar posiciones a la GPU
         cudaMemcpy(d_rx, h_rx, N * sizeof(float), cudaMemcpyHostToDevice);
         cudaMemcpy(d_ry, h_ry, N * sizeof(float), cudaMemcpyHostToDevice);
         cudaMemcpy(d_rz, h_rz, N * sizeof(float), cudaMemcpyHostToDevice);
 
-        init_vel<<<(N + 255) / 256, 256>>>(d_vx, d_vy, d_vz, &Temp, &Ekin);
         cudaDeviceSynchronize(); // Esperar a que se complete la inicialización de velocidades
 
         forces<<<(N + 255) / 256, 256>>>(d_rx, d_ry, d_rz, d_fx, d_fy, d_fz, &Epot, &Pres, &Temp, Rho, cell_V, cell_L);
@@ -139,11 +138,11 @@ int main()
         printf("%f\t%f\t%f\t%f\n", Rho, cell_V, epotm / (double)mes, presm / (double)mes);
     }
 
-    double elapsed = wtime() - start;
-    printf("# Tiempo total de simulación = %f segundos\n", elapsed);
+    // double elapsed = wtime() - start;
+    // printf("# Tiempo total de simulación = %f segundos\n", elapsed);
     printf("# Tiempo simulado = %f [fs]\n", t * 1.6);
-    printf("# ns/day = %f\n", (1.6e-6 * t) / elapsed * 86400);
-    printf("# cells/s = %f\n\n", (N /(elapsed)));
+    // printf("# ns/day = %f\n", (1.6e-6 * t) / elapsed * 86400);
+    // printf("# cells/s = %f\n\n", (N / (elapsed)));
 
     // Cierre de archivos
     fclose(file_thermo);
@@ -159,7 +158,7 @@ int main()
     free(h_vx);
     free(h_vy);
     free(h_vz);
-    
+
     // Liberar memoria en el dispositivo
     cudaFree(d_rx);
     cudaFree(d_ry);
