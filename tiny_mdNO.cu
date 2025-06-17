@@ -96,17 +96,31 @@ int main()
 
         cudaDeviceSynchronize(); // Esperar a que se complete la inicialización de velocidades
 
-        cudaMemset(d_fx, 0, N * sizeof(float));
-        cudaMemset(d_fy, 0, N * sizeof(float));
-        cudaMemset(d_fz, 0, N * sizeof(float));
+        cudaMemset(d_fx,   0, N*sizeof(float));
+        cudaMemset(d_fy,   0, N*sizeof(float));
+        cudaMemset(d_fz,   0, N*sizeof(float));
+        cudaMemset(d_Epot, 0, sizeof(float));
+        cudaMemset(d_Pres, 0, sizeof(float));
+
+
         forces<<<grid, block>>>(d_rx, d_ry, d_rz, d_fx, d_fy, d_fz, d_Epot, d_Pres, d_Temp, Rho, cell_V, cell_L);
+        
+        
         cudaDeviceSynchronize(); // Esperar a que se complete el cálculo de fuerzas
         cudaMemcpy(&h_Epot, d_Epot, sizeof(float), cudaMemcpyDeviceToHost);
         cudaMemcpy(&h_Pres, d_Pres, sizeof(float), cudaMemcpyDeviceToHost);
+
+        h_Pres = h_Temp * Rho + h_Pres / (3.0f * cell_V);
+        h_Epot += Etail;
+        h_Pres += Ptail;
+
+
         cudaMemcpy(&h_Ekin, d_Ekin, sizeof(float), cudaMemcpyDeviceToHost);
         cudaMemcpy(h_fx, d_fx, N * sizeof(float), cudaMemcpyDeviceToHost);
         cudaMemcpy(h_fy, d_fy, N * sizeof(float), cudaMemcpyDeviceToHost);
         cudaMemcpy(h_fz, d_fz, N * sizeof(float), cudaMemcpyDeviceToHost);
+
+        printf
 
         for (int i = 1; i < TEQ; i++) { // loop de
 
@@ -206,6 +220,8 @@ int main()
     cudaFree(d_fx);
     cudaFree(d_fy);
     cudaFree(d_fz);
-
+    cudaFree(d_Epot);
+    cudaFree(d_Pres);
+    cudaFree(d_Temp);
     return 0;
 }
