@@ -14,7 +14,8 @@ int main()
     file_thermo = fopen("thermo.log", "w");
     float h_Ekin, h_Epot, h_Temp, h_Pres; // variables macroscopicas
     float Rho, cell_V, cell_L, tail, Etail, Ptail;
-
+    dim3 block(32);
+    dim3 grid(N);
     // Declarar punteros para la memoria en el host
     float *h_rx, *h_ry, *h_rz, *h_vx, *h_vy, *h_vz, *h_fx, *h_fy, *h_fz;
     // Declarar punteros para la memoria en el dispositivo
@@ -98,17 +99,17 @@ int main()
         cudaMemset(d_fx, 0, N * sizeof(float));
         cudaMemset(d_fy, 0, N * sizeof(float));
         cudaMemset(d_fz, 0, N * sizeof(float));
-        forces<<<(N + 255) / 256, 256>>>(d_rx, d_ry, d_rz, d_fx, d_fy, d_fz, d_Epot, d_Pres, d_Temp, Rho, cell_V, cell_L);
+        forces<<<grid, block>>>(d_rx, d_ry, d_rz, d_fx, d_fy, d_fz, d_Epot, d_Pres, d_Temp, Rho, cell_V, cell_L);
         cudaDeviceSynchronize(); // Esperar a que se complete el cálculo de fuerzas
-
+        cudaMemcpy(&h_Epot, d_Epot, sizeof(float), cudaMemcpyDeviceToHost);
+        cudaMemcpy(&h_Pres, d_Pres, sizeof(float), cudaMemcpyDeviceToHost);
+        cudaMemcpy(&h_Ekin, d_Ekin, sizeof(float), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_fx, d_fx, N * sizeof(float), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_fy, d_fy, N * sizeof(float), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_fz, d_fz, N * sizeof(float), cudaMemcpyDeviceToHost);
 
         for (int i = 1; i < TEQ; i++) { // loop de
-            cudaMemcpy(&h_Epot, d_Epot, sizeof(float), cudaMemcpyDeviceToHost);
-            cudaMemcpy(&h_Pres, d_Pres, sizeof(float), cudaMemcpyDeviceToHost);
-            cudaMemcpy(&h_Ekin, d_Ekin, sizeof(float), cudaMemcpyDeviceToHost);
-            cudaMemcpy(h_fx, d_fx, N * sizeof(float), cudaMemcpyDeviceToHost);
-            cudaMemcpy(h_fy, d_fy, N * sizeof(float), cudaMemcpyDeviceToHost);
-            cudaMemcpy(h_fz, d_fz, N * sizeof(float), cudaMemcpyDeviceToHost);
+
             velocity_verlet(h_rx, h_ry, h_rz, h_vx, h_vy, h_vz, h_fx, h_fy, h_fz, &h_Epot, &h_Ekin, &h_Pres, &h_Temp, Rho, cell_V, cell_L);
 
             sf = sqrtf(T0 / h_Temp);

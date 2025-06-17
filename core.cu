@@ -24,23 +24,25 @@ __global__ void forces(
     float* fx, float* fy, float* fz,
     float* epot, float* pres, float* temp, float rho, float V, float L)
 {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    if (i >= N - 1)
-        return;
-
+    const float rcut2 = RCUT * RCUT;
     float local_epot = 0.0f;
     float pres_vir = 0.0f;
-    const float rcut2 = RCUT * RCUT;
-    for (int i = 0; i < (N - 1); i += 1) {
-        float xi = rx[i];
-        float yi = ry[i];
-        float zi = rz[i];
-        for (int j = i + 1; j < N; j += 1) {
-            const float xj = rx[j];
-            const float yj = ry[j];
-            const float zj = rz[j];
 
-            // distancia mínima entre r_i y r_j
+    unsigned int j = threadIdx.x;
+    unsigned int row = blockIdx.x;
+    float fxi = 0.0f;
+    float fyi = 0.0f;
+    float fzi = 0.0f;
+    for (; j < N; j += 32) {
+        if (j != row) {
+            float xi = rx[row];
+            float yi = ry[row];
+            float zi = rz[row];
+
+            float xj = rx[j];
+            float yj = ry[j];
+            float zj = rz[j];
+
             float _rx = xi - xj;
             _rx = minimum_image(_rx, L);
             float _ry = yi - yj;
@@ -53,28 +55,22 @@ __global__ void forces(
             if (rij2 <= rcut2) {
                 const float r2inv = 1.0f / rij2;
                 const float r6inv = r2inv * r2inv * r2inv;
-
                 float fr = 24.0f * r2inv * r6inv * (2.0f * r6inv - 1.0f);
-
-                // --RACECONDITION INIT--
-                atomicAdd(&fx[i], fr * _rx);
-                atomicAdd(&fy[i], fr * _ry);
-                atomicAdd(&fz[i], fr * _rz);
-
-                atomicAdd(&fx[j], -fr * _rx);
-                atomicAdd(&fy[j], -fr * _ry);
-                atomicAdd(&fz[j], -fr * _rz);
-
+                fxi += fr * _rx;
+                fyi += fr * _ry;
+                fzi += fr * _rz;
                 local_epot += (4.0f * r6inv * (r6inv - 1.0f) - ECUT);
                 pres_vir += fr * rij2;
-
-                // --RACECONDITION END--
             }
         }
     }
-    pres_vir /= (V * 3.0f);
-    *pres = *temp * rho + pres_vir;
-    *epot = local_epot;
+
+    atomicAdd(&fx[row], fxi);
+    atomicAdd(&fy[row], fyi);
+    atomicAdd(&fz[row], fzi);
+
+    atomicAdd(epot, local_epot);
+    atomicAdd(pres, pres_vir / (V * 3.0f));
 }
 
 __host__ void init_vel(float* vx, float* vy, float* vz, float* temp, float* ekin)
@@ -125,6 +121,8 @@ __host__ void velocity_verlet(float* rx, float* ry, float* rz, float* vx, float*
                               float* ekin, float* pres, float* temp, const float rho,
                               const float V, const float L)
 {
+    dim3 block(32);
+    dim3 grid(N);
     float *d_rx, *d_ry, *d_rz, *d_vx, *d_vy, *d_vz, *d_fx, *d_fy, *d_fz, *d_epot;
     float *d_Epot, *d_Ekin, *d_Temp, *d_Pres;
     cudaMalloc(&d_Epot, sizeof(float));
@@ -164,17 +162,13 @@ __host__ void velocity_verlet(float* rx, float* ry, float* rz, float* vx, float*
     cudaMemcpy(d_ry, ry, N * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(d_rz, rz, N * sizeof(float), cudaMemcpyHostToDevice);
 
-    cudaMemcpy(d_vx, vx, N * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_vy, vy, N * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_vz, vz, N * sizeof(float), cudaMemcpyHostToDevice);
-
 
     cudaDeviceSynchronize(); // Esperar a que se complete la inicialización de velocidades
 
     cudaMemset(d_fx, 0, N * sizeof(float));
     cudaMemset(d_fy, 0, N * sizeof(float));
     cudaMemset(d_fz, 0, N * sizeof(float));
-    forces<<<(N + 255) / 256, 256>>>(d_rx, d_ry, d_rz, d_fx, d_fy, d_fz, d_Epot, d_Pres, d_Temp, rho, V, L);
+    forces<<<grid, block>>>(d_rx, d_ry, d_rz, d_fx, d_fy, d_fz, d_Epot, d_Pres, d_Temp, rho, V, L);
     cudaDeviceSynchronize();
 
     cudaMemcpy(epot, d_Epot, sizeof(float), cudaMemcpyDeviceToHost);
@@ -186,7 +180,6 @@ __host__ void velocity_verlet(float* rx, float* ry, float* rz, float* vx, float*
     cudaMemcpy(fz, d_fz, N * sizeof(float), cudaMemcpyDeviceToHost);
 
     float sumv2 = 0.0;
-    // #pragma omp parallel for reduction(+:sumv2)
     for (int i = 0; i < N; i += 1) { // actualizo velocidades
         vx[i] += 0.5f * fx[i] * DT;
         vy[i] += 0.5f * fy[i] * DT;
